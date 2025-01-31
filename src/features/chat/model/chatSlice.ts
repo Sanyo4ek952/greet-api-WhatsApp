@@ -1,11 +1,14 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
-import {Authorized} from "../ui/SignIn";
+import {ReceiveMessageResponse} from "../../../service/baseApi";
+
 
 
 type InitialState = {
-    idInstance: string ,
-    apiTokenInstance:string ,
-    isAuthorized: boolean
+    myMessage:[{id:number,text:string}]
+    theirMessage:ReceiveMessageResponse ,
+    phoneNumber: number
+    chats: Array<{ phoneNumber: string; lastMessage: string }>
+    activeChat: string | null
 }
 const initialState:InitialState = {
     idInstance: "",
@@ -20,7 +23,7 @@ export const authorizedSlice = createSlice({
     reducers: {
         setAuthorized(state, action: PayloadAction<Authorized>) {
             const {idInstance,apiTokenInstance }=action.payload;
-           return  {...state, isAuthorized: true, idInstance, apiTokenInstance }
+            return  {...state, isAuthorized: true, idInstance, apiTokenInstance }
         },
 
     },
