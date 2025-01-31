@@ -2,10 +2,12 @@
 
 import React, { forwardRef, useState } from 'react'
 
-import { EyeOffOutline, EyeOutline } from '@/assets/icons/components'
-import { combineClasses } from '@/common/utils/combineClasses'
 
-import styles from './input.module.scss'
+
+import styles from '../Input/input.module.scss'
+import EyeOffOutline from "../../../assets/icon/components/EyeOffOutline";
+import EyeOutline from "../../../assets/icon/components/EyeOutline";
+import clsx from "clsx";
 
 export type InputProps = {
   errorMessage?: string
@@ -45,7 +47,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div
-        className={combineClasses(styles.container, propsClassName, errorMessage && styles.error)}
+        className={clsx(styles.container, propsClassName, errorMessage && styles.error)}
       >
         <label className={styles.label} htmlFor={label}>
           {label}

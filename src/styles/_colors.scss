@@ -1,44 +1,29 @@
 :root {
-  // accent
-  --color-accent-100: #73a5ff;
-  --color-accent-300: #4c8dff;
-  --color-accent-500: #397df6;
-  --color-accent-700: #2f68cc;
-  --color-accent-900: #234e99;
+  // gray
+  --gray-30: #f7f8fa;
+  --gray-60: #f0f2f5;
+  --gray-70: #f0f2f5;
 
-  // Success
-  --color-success-100: #80ffbf;
-  --color-success-300: #22e584;
-  --color-success-500: #14cc70;
-  --color-success-700: #0f9954;
-  --color-success-900: #0a6638;
+  // teal
+  --teal-light: #7ae3c3;
+  --teal-lighter: #00a884;
+  --teal: #008069;
 
-  // Danger
-  --color-danger-100: #ff8099;
-  --color-danger-300: #f23d61;
-  --color-danger-500: #cc1439;
-  --color-danger-700: #990f2b;
-  --color-danger-900: #660a1d;
+  // green
+  --green-deep: #1fa855;
+  --green: #25d366;
+  --green-accent: #25d366;
 
-  // Warning
+  // blue-sky
 
-  --color-warning-100: #ffd073;
-  --color-warning-300: #e5ac39;
-  --color-warning-500: #d99000;
-  --color-warning-700: #960;
-  --color-warning-900: #640;
+  --blue-sky: #93d7f5;
+  --blue-sky-light: #def3fc;
+  --blue: #027eb5;
 
-  // Dark
-  --color-dark-100: #4c4c4c;
-  --color-dark-300: #333;
-  --color-dark-500: #171717;
-  --color-dark-700: #0d0d0d;
-  --color-dark-900: #000;
+ --main-background: #202c33;
 
-  // Light
-  --color-light-100: #fff;
-  --color-light-300: #f7fbff;
-  --color-light-500: #edf3fa;
-  --color-light-700: #d5dae0;
-  --color-light-900: #8d9094;
+  --button-primary-background: #00a884;
+  --button-primary-background-hover: #2ab58d;
+  --button-primary-background-active: #036c54;
+  --button-primary-background-disabled: #2a3942;
 }

@@ -8,7 +8,7 @@
   line-height: var(--line-height-m);
 
   border-style: none;
-  border-radius: 2px;
+  border-radius: 24px;
 
   &:disabled {
     cursor: default;
@@ -16,24 +16,24 @@
 }
 
 .primary {
-  background-color: var(--color-accent-500);
+  background-color: var(--button-primary-background);
 
   &:active {
-    background-color: var(--color-accent-700);
+    background-color: var(--button-primary-background-active);
   }
 
   &:hover {
-    background-color: var(--color-accent-100);
+    background-color: var(--button-primary-background-hover);
   }
 
   &:focus {
-    background-color: var(--color-accent-500);
-    border: 1px solid var(--color-accent-700);
+    background-color: var(--button-primary-background);
+    border: 1px solid var(--button-primary-background-active);
   }
 
   &:disabled {
-    color: var(--color-light-900);
-    background-color: var(--color-accent-900);
+    color: grey;
+    background-color: var( --button-primary-background-disabled);
   }
 }
 
