@@ -15,7 +15,7 @@ const initialState:InitialState = {
 
 
 export const authorizedSlice = createSlice({
-    name: 'todos',
+    name: 'authorized',
     initialState: initialState,
     reducers: {
         setAuthorized(state, action: PayloadAction<Authorized>) {

@@ -1,77 +1,92 @@
-import React, {useState} from 'react';
-import {useDeleteMessageMutation, useReceiveMessageQuery, useSendMessageMutation} from "../../../service/baseApi";
-import {useAppSelector} from "../../../common/utils/storeHook";
+import React, {useState, useEffect} from 'react';
+import {
+    useDeleteMessageMutation,
+    useReceiveMessageQuery,
+    useSendMessageMutation,
+    useSetSettingsMutation
+} from '../../../service/baseApi';
+import {useAppDispatch, useAppSelector} from '../../../common/utils/storeHook';
 import styles from './Chat.module.scss';
-import {Button} from "../../../common/components/Button";
+import {Button} from '../../../common/components/Button';
+import {addChat, setPhoneNumber, setActiveChat, sendMessage, receiveMessage, deleteMessage} from '../model/chatSlice';
 
 const Chat = () => {
+    const dispatch = useAppDispatch();
+    const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
+    const {
+        phoneNumber,
+        chats,
+        activeChat,
+        myMessages,
+        theirMessages,
+    } = useAppSelector(state => state.chat);
+
     const [message, setMessage] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [messages, setMessages] = useState<Array<{ text: string; sender: 'me' | 'them' }>>([]);
-    const [chats, setChats] = useState<Array<{ phoneNumber: string; lastMessage: string }>>([]);
-    const [activeChat, setActiveChat] = useState<string | null>(null);
-    const idInstance = useAppSelector(state => state.authorized.idInstance);
-    const apiTokenInstance = useAppSelector(state => state.authorized.apiTokenInstance);
-    const [sendMessage, {isLoading, isSuccess, isError}] = useSendMessageMutation();
+
+    const [sendMessageApi, {isLoading, isSuccess, isError}] = useSendMessageMutation();
     const {data: getMessages, refetch} = useReceiveMessageQuery({idInstance, apiTokenInstance});
-    const [deleteMessageApi] = useDeleteMessageMutation()
-    console.log(getMessages)
-    // Функция для добавления нового чата
+    const [deleteMessageApi] = useDeleteMessageMutation();
+    const [setSetting] = useSetSettingsMutation();
+
+    // Добавление чата
     const handleAddChat = () => {
-        if (phoneNumber.trim()) {
-            const chatExists = chats.some(chat => chat.phoneNumber === phoneNumber);
-            if (!chatExists) {
-                setChats([...chats, {phoneNumber, lastMessage: ''}]);
-                setPhoneNumber('');
-            } else {
-                alert('Этот чат уже существует');
-            }
+        if (phoneNumber) {
+            dispatch(addChat(phoneNumber));
+            dispatch(setPhoneNumber(''));
         }
     };
 
-
-    // Функция для отправки сообщения
+    // Отправка сообщения
     const handleSend = async () => {
-        try {
-            if (message.trim() && phoneNumber.trim()) {
-                const messageData = {phoneNumber, message, idInstance, apiTokenInstance};
-                await sendMessage(messageData).unwrap();
-
-                setMessages([...messages, {text: message, sender: 'me'}]);
+        if (message.trim() && activeChat) {
+            try {
+                await sendMessageApi({phoneNumber: activeChat, message, idInstance, apiTokenInstance}).unwrap();
+                dispatch(sendMessage({text: message}));
                 setMessage('');
-
-                setChats(chats.map(chat =>
-                    chat.phoneNumber === phoneNumber
-                        ? {...chat, lastMessage: message}
-                        : chat
-                ));
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
             }
-        } catch (error) {
-            console.error('Ошибка при отправке сообщения:', error);
         }
     };
 
-    // Функция для выбора чата
+    // Выбор чата
     const handleSelectChat = (phoneNumber: string) => {
-        setActiveChat(phoneNumber);
-        setPhoneNumber(phoneNumber);
-        setMessages([]); // Очищаем сообщения при выборе нового чата
+        dispatch(setActiveChat(phoneNumber));
     };
-
-    const updateMessage = () => {
-        refetch().then(res=>{
-                if(res.data) {
-                    const receiptId = res.data.receiptId
-                    deleteMessageApi({idInstance, apiTokenInstance, receiptId})
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const res = await refetch().unwrap();
+                // Проверка на наличие данных в ответе
+                if (res && res.body) {
+                    dispatch(receiveMessage(res)); // Добавляем новое сообщение
+                    const receiptId = res.receiptId;
+                    // Удаляем сообщение после обработки
+                    await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
                 }
+            } catch (error) {
+                console.error('Ошибка при обновлении сообщений:', error);
+            }
+        }, 1000); // Интервал 1 секунда (1000 миллисекунд)
 
-
-
-
-
+        // Очистка интервала при размонтировании компонента
+        return () => clearInterval(interval);
+    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch]); // Зависимости
+    // Обновление сообщений
+    const updateMessage = async () => {
+        refetch().unwrap().then(res => {
+            dispatch(receiveMessage(res))
+            const receiptId = res.receiptId
+            deleteMessageApi({idInstance, apiTokenInstance, receiptId})
         })
+        // Если приходит входящее сообщение
 
+
+    };
+    const setSettingHandler = () => {
+        setSetting({idInstance, apiTokenInstance})
     }
+    console.log([...myMessages, ...theirMessages])
     return (
         <div className={styles.container}>
             <div className={styles.leftColumn}>
@@ -80,18 +95,15 @@ const Chat = () => {
                         maxLength={11}
                         type="text"
                         value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
                         placeholder="Введите номер телефона"
                         className={styles.input}
                     />
-                    <Button
-                        onClick={handleAddChat}
-                        disabled={isLoading}
-                        className={styles.button}
-                    >
+                    <Button onClick={handleAddChat} disabled={isLoading} className={styles.button}>
                         Добавить чат
                     </Button>
-                    <Button onClick={updateMessage}>Update</Button>
+                    <Button onClick={updateMessage}>Обновить</Button>
+                    <Button onClick={setSettingHandler}>Setting</Button>
                 </div>
                 <div className={styles.chatList}>
                     <h3>Чаты</h3>
@@ -111,11 +123,25 @@ const Chat = () => {
             <div className={styles.rightColumn}>
                 <div className={styles.chatWindow}>
                     <div className={styles.messages}>
-                        {messages.map((msg, index) => (
-                            <div key={index} className={msg.sender === 'me' ? styles.myMessage : styles.theirMessage}>
-                                {msg.text}
-                            </div>
-                        ))}
+                        {[...myMessages, ...theirMessages].map((msg, index) => {
+                            // Проверяем, является ли сообщение объектом типа ReceiveMessageResponse или Message
+                            if ('text' in msg) { // Проверка на наличие поля text, чтобы убедиться, что это Message
+                                return (
+                                    <div key={index}
+                                         className={msg.sender === 'me' ? styles.myMessage : styles.theirMessage}>
+                                        {msg.text}
+                                    </div>
+                                );
+                            } else if (msg.body?.messageData?.textMessageData?.textMessage) { // Проверка для ReceiveMessageResponse
+                                const messageText = msg.body.messageData.textMessageData.textMessage;
+                                return (
+                                    <div key={index} className={styles.theirMessage}>
+                                        {messageText}
+                                    </div>
+                                );
+                            }
+                            return null; // Возвращаем null, если не нашли подходящий тип
+                        })}
                     </div>
 
                     <div className={styles.inputArea}>
@@ -128,17 +154,11 @@ const Chat = () => {
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                         />
                     </div>
-
                     <div className={styles.inputArea}>
-                        <button
-                            onClick={handleSend}
-                            disabled={isLoading}
-                            className={styles.button}
-                        >
+                        <button onClick={handleSend} disabled={isLoading} className={styles.button}>
                             {isLoading ? 'Отправка...' : 'Отправить'}
                         </button>
                     </div>
-
                     {isSuccess && <div className={styles.successMessage}>Сообщение отправлено!</div>}
                     {isError && <div className={styles.errorMessage}>Ошибка при отправке сообщения</div>}
                 </div>

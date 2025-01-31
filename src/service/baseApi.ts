@@ -3,17 +3,14 @@ import { baseQuery } from './baseQuery';
 
 export const baseApi = createApi({
     reducerPath: 'baseApi',
-    baseQuery: baseQuery, // Ссылка на baseQuery
+    baseQuery: baseQuery,
     endpoints: (builder) => ({
         sendMessage: builder.mutation({
             query: ({ phoneNumber, message, idInstance, apiTokenInstance }) => {
-                // Формируем данные для отправки сообщения
                 const data = {
-                    chatId: `${phoneNumber}@c.us`, // Формат номера с @c.us
+                    chatId: `${phoneNumber}@c.us`,
                     message: message
                 };
-
-                // Возвращаем запрос с необходимым URL
                 return {
                     url: `/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
                     method: 'POST',
@@ -21,59 +18,73 @@ export const baseApi = createApi({
                 };
             },
         }),
-
-        receiveMessage: builder.query<ReceiveMessageResponse,{idInstance:string,apiTokenInstance:string}>({
+        setSettings: builder.mutation({
             query: ({ idInstance, apiTokenInstance }) => {
-
+                const data = {
+                    webhookUrl: "",
+                    outgoingWebhook: "yes",
+                    stateWebhook: "yes",
+                    incomingWebhook: "yes"
+                };
                 return {
-                    url: `/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`,
-                    method: 'GET',
+                    url: `/waInstance${idInstance}/setSettings/${apiTokenInstance}`,
+                    method: 'POST',
+                    body: data,
                 };
             },
         }),
-        deleteMessage: builder.mutation({
-            query: ({ idInstance, apiTokenInstance,receiptId }) => {
+        receiveMessage: builder.query<ReceiveMessageResponse, { idInstance: string, apiTokenInstance: string }>({
+            query: ({ idInstance, apiTokenInstance }) => ({
+                url: `/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`,
+                method: 'GET',
+            }),
+        }),
 
-                return {
-                    url: `/waInstance${idInstance}/deleteNotification/${apiTokenInstance}/${receiptId}`,
-                    method: 'DELETE',
-                    body: {receiptId},
-                };
-            },
+        deleteMessage: builder.mutation({
+            query: ({ idInstance, apiTokenInstance, receiptId }) => ({
+                url: `/waInstance${idInstance}/deleteNotification/${apiTokenInstance}/${receiptId}`,
+                method: 'DELETE',
+                body: { receiptId },
+            }),
         }),
     }),
-    tagTypes: ['Messages'],
 });
 
-// Экспортируем хук для использования в компонентах
-export const { useSendMessageMutation, useReceiveMessageQuery, useDeleteMessageMutation } = baseApi;
+export const { useSendMessageMutation, useReceiveMessageQuery, useDeleteMessageMutation, useSetSettingsMutation } = baseApi;
+
+
 export type ReceiveMessageResponse = {
-	receiptId: number;
-	body: FdBody;
-}
+    receiptId: number;
+    body: FdBody;
+};
+
 export type FdBodyInstanceData = {
-	idInstance: number;
-	wid: string;
-	typeInstance: string;
-}
+    idInstance: number;
+    wid: string;
+    typeInstance: string;
+};
+
 export type FdBodySenderData = {
-	chatId: string;
-	sender: string;
-	senderName: string;
-	senderContactName: string;
-}
+    chatId: string;
+    sender: string;
+    senderName: string;
+    senderContactName: string;
+};
+
 export type FdBodyMessageDataTextMessageData = {
-	textMessage: string;
-}
+    textMessage: string;
+};
+
 export type FdBodyMessageData = {
-	typeMessage: string;
-	textMessageData: FdBodyMessageDataTextMessageData;
-}
+    typeMessage: string;
+    textMessageData: FdBodyMessageDataTextMessageData;
+};
+
 export type FdBody = {
-	typeWebhook: string;
-	instanceData: FdBodyInstanceData;
-	timestamp: number;
-	idMessage: string;
-	senderData: FdBodySenderData;
-	messageData: FdBodyMessageData;
-}
+    typeWebhook: string;
+    instanceData: FdBodyInstanceData;
+    timestamp: number;
+    idMessage: string;
+    senderData: FdBodySenderData;
+    messageData: FdBodyMessageData;
+};
