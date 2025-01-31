@@ -1,0 +1,104 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-light-900);
+}
+
+.label {
+  font-size: var(--font-size-s);
+}
+
+.input {
+  position: relative;
+
+  width: 100%;
+  padding: 6px 40px 6px 12px;
+
+  color: var(--color-light-100);
+
+  background-color: transparent;
+  border: 1px solid var(--color-dark-100);
+  border-radius: 2px;
+
+  &:active {
+    color: var(--color-light-100);
+    background-color: var(--color-dark-500);
+    border: 1px solid var(--color-light-100);
+  }
+
+  &:focus {
+    color: var(--color-light-100);
+    border: 2px solid var(--color-accent-500);
+  }
+
+  &:disabled {
+    color: var(--color-dark-100);
+    border: 1px solid var(--color-dark-100);
+  }
+}
+
+.error {
+  & > .input {
+    border: 1px solid var(--color-danger-500);
+  }
+}
+
+.errorMessage {
+  align-self: flex-start;
+  min-height: 24px;
+  color: var(--color-danger-500);
+}
+
+.hidden {
+  overflow: hidden;
+}
+
+.button {
+  cursor: pointer;
+
+  position: absolute;
+  top: 27px;
+  right: 10px;
+
+  padding: 0;
+
+  font-size: 20px;
+  color: white;
+
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.inputSearch {
+  padding: 6px 12px 6px 40px;
+}
+
+.buttonSearch {
+  cursor: pointer;
+
+  position: absolute;
+  bottom: 5px;
+  left: 10px;
+
+  padding: 0;
+
+  font-size: 20px;
+
+  background: none;
+  border: none;
+  outline: none;
+
+  &::before {
+    content: '';
+
+    display: block;
+
+    width: 24px;
+    height: 24px;
+
+    background-image: url('search.svg');
+    background-size: cover;
+  }
+}
