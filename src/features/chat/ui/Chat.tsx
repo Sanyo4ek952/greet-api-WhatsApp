@@ -1,18 +1,20 @@
-import React, {useEffect} from 'react';
+import React, {useLayoutEffect} from 'react';
 import styles from './Chat.module.scss';
 import {ChatList} from "./ChatList/ChatList";
 import {ChatWindow} from "./ChatWindow/ChatWindow";
 import {PhoneInput} from "./PhoneInput/PhoneInput";
-import {useAppSelector} from "../../../common/utils/storeHook";
 import {useNavigate} from "react-router-dom";
+import {storage} from "../../../common/utils/storage";
 
 const Chat = () => {
-    const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
-    const navigate = useNavigate();
+    const idInstance = storage.getIdInstance()
+    const apiTokenInstance = storage.getApiTokenInstance()
+    let navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (idInstance === '' || apiTokenInstance === '') {
-            navigate('/')
+            navigate(-1)
+            return
         }
     }, [idInstance, apiTokenInstance, navigate]);
     return (

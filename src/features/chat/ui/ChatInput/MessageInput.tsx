@@ -4,15 +4,16 @@ import {sendMessage} from "../../model/chatSlice";
 import {useAppDispatch, useAppSelector} from "../../../../common/utils/storeHook";
 import {useSendMessageMutation} from "../../../../service/baseApi";
 import {Button} from "../../../../common/components/Button";
+import {storage} from "../../../../common/utils/storage";
 
 
 export const MessageInput = () => {
     const [message, setMessage] = useState('');
-    const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
+    const idInstance = storage.getIdInstance()
+    const apiTokenInstance = storage.getApiTokenInstance()
     const dispatch = useAppDispatch();
 
     const {
-        phoneNumber,
         activeChat,
     } = useAppSelector(state => state.chat);
 
@@ -22,7 +23,7 @@ export const MessageInput = () => {
         if (message.trim() && activeChat) {
             try {
                 await sendMessageApi({phoneNumber: activeChat, message, idInstance, apiTokenInstance}).unwrap();
-                dispatch(sendMessage({text: message, phoneNumber}));
+                dispatch(sendMessage({text: message, phoneNumber:activeChat}));
                 setMessage('');
             } catch (error) {
                 console.error('Ошибка при отправке сообщения:', error);

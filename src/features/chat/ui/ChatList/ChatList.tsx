@@ -3,18 +3,20 @@ import styles from './ChatList.module.scss';
 import {Message, receiveMessage, setActiveChat} from "../../model/chatSlice";
 import {useDeleteMessageMutation, useReceiveMessageQuery} from "../../../../service/baseApi";
 import {useAppDispatch, useAppSelector} from "../../../../common/utils/storeHook";
+import {storage} from "../../../../common/utils/storage";
 
 
 export const ChatList = () => {
     const dispatch = useAppDispatch();
     const [isFetching, setIsFetching] = useState(false);
 
-    const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
+    const idInstance = storage.getIdInstance()
+    const apiTokenInstance = storage.getApiTokenInstance()
     const {
         chats,
         activeChat,
     } = useAppSelector(state => state.chat);
-    const {refetch} = useReceiveMessageQuery({idInstance, apiTokenInstance});
+    const {refetch} = useReceiveMessageQuery({ idInstance: idInstance || '', apiTokenInstance: apiTokenInstance || '' });
     const [deleteMessageApi] = useDeleteMessageMutation();
     const onSelectChat = (phoneNumber: string) => {
         dispatch(setActiveChat(phoneNumber));

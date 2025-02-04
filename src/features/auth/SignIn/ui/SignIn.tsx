@@ -6,6 +6,7 @@ import styles from './SingIn.module.scss';
 import {setAuthorized} from "../model/authSlice";
 import {useAppDispatch} from "../../../../common/utils/storeHook";
 import {useNavigate} from "react-router-dom";
+import {storage} from "../../../../common/utils/storage";
 
 export type Authorized = {
     idInstance: string;
@@ -23,6 +24,8 @@ export const SignIn = () => {
     const dispatch = useAppDispatch();
     let navigate = useNavigate();
     const formPost = (data: Authorized) => {
+        storage.setApiTokenInstance(data.apiTokenInstance)
+        storage.setIdInstance(data.idInstance)
         dispatch(setAuthorized(data));
         navigate('/chat')
     };
