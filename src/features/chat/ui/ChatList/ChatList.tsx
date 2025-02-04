@@ -53,7 +53,7 @@ export const ChatList = () => {
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch]);
+    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch, isFetching]);
     return (
         <div className={styles.chatList}>
             <h3>Чаты</h3>

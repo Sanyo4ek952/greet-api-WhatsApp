@@ -12,7 +12,7 @@ const Chat = () => {
 
     useEffect(() => {
         if (idInstance === '' || apiTokenInstance === '') {
-            navigate('/')
+            navigate('/greet-api-WhatsApp/')
         }
     }, [idInstance, apiTokenInstance, navigate]);
     return (
