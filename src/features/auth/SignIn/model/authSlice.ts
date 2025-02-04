@@ -3,12 +3,12 @@ import {Authorized} from "../ui/SignIn";
 
 
 type InitialState = {
-    idInstance: string ,
+    idInstance: string  ,
     apiTokenInstance:string ,
     isAuthorized: boolean
 }
 const initialState:InitialState = {
-    idInstance: "",
+    idInstance: '',
     apiTokenInstance:"",
     isAuthorized: false
 }

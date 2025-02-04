@@ -10,12 +10,14 @@ export const MessageInput = () => {
     const [message, setMessage] = useState('');
     const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
     const dispatch = useAppDispatch();
+
     const {
         phoneNumber,
-        chats,
         activeChat,
     } = useAppSelector(state => state.chat);
+
     const [sendMessageApi, {isLoading, isSuccess, isError}] = useSendMessageMutation();
+
     const handleSend = async () => {
         if (message.trim() && activeChat) {
             try {
@@ -27,6 +29,7 @@ export const MessageInput = () => {
             }
         }
     };
+
     return (
         <>
             <div className={styles.inputArea}>
@@ -36,9 +39,10 @@ export const MessageInput = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Введите сообщение"
                     className={styles.input}
+                    disabled={!activeChat}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 />
-                <Button onClick={handleSend} disabled={isLoading}>
+                <Button onClick={handleSend} disabled={isLoading || !activeChat}>
                     {isLoading ? 'Отправка...' : 'Отправить'}
                 </Button>
             </div>

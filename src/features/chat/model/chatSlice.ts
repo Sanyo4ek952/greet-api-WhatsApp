@@ -43,9 +43,9 @@ export const chatSlice = createSlice({
         addChat: (state, action: PayloadAction<string>) => {
             const phoneNumber = action.payload;
             const chatExists = state.chats.find((chat: ChatType) => chat.chatId === phoneNumber);
-            if(chatExists){
+            if (chatExists) {
                 return
-            }else{
+            } else {
 
                 state.chats.unshift({chatId: phoneNumber, messages: []});
             }
