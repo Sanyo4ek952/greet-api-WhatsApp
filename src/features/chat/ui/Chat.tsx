@@ -8,7 +8,14 @@ import {
 import {useAppDispatch, useAppSelector} from '../../../common/utils/storeHook';
 import styles from './Chat.module.scss';
 import {Button} from '../../../common/components/Button';
-import {addChat, setPhoneNumber, setActiveChat, sendMessage, receiveMessage, deleteMessage} from '../model/chatSlice';
+import {
+    addChat,
+    setPhoneNumber,
+    setActiveChat,
+    sendMessage,
+    receiveMessage,
+     Message
+} from '../model/chatSlice';
 
 const Chat = () => {
     const dispatch = useAppDispatch();
@@ -58,17 +65,36 @@ const Chat = () => {
         const interval = setInterval(async () => {
             try {
                 const res = await refetch().unwrap();
+
                 // Проверка на наличие данных в ответе
-                if (res && res.body) {
-                    dispatch(receiveMessage(res)); // Добавляем новое сообщение
-                    const receiptId = res.receiptId;
+                console.log('res', res)
+                console.log('getMessages', getMessages)
+                if (res && res.body && res.body.messageData?.textMessageData?.textMessage) {
+                    const message: Message = {
+                        id: Date.now(),
+                        text: res.body.messageData.textMessageData.textMessage,
+                        sender: 'them'
+                    }
+                    const chat = {
+                        chatId: res.body.senderData.chatId.substring(0, 11),
+                        messages: message
+                    }
+
+                    dispatch(receiveMessage(chat)); // Добавляем новое сообщение
+
                     // Удаляем сообщение после обработки
+
+                }
+                if(res){
+                    const receiptId = res.receiptId;
                     await deleteMessageApi({idInstance, apiTokenInstance, receiptId});
                 }
+
             } catch (error) {
                 console.error('Ошибка при обновлении сообщений:', error);
             }
-        }, 1000); // Интервал 1 секунда (1000 миллисекунд)
+            return () => clearInterval(interval);
+        }, 3000); // Интервал 1 секунда (1000 миллисекунд)
 
         // Очистка интервала при размонтировании компонента
         return () => clearInterval(interval);
@@ -76,7 +102,7 @@ const Chat = () => {
     // Обновление сообщений
     const updateMessage = async () => {
         refetch().unwrap().then(res => {
-            dispatch(receiveMessage(res))
+            // dispatch(receiveMessage(res))
             const receiptId = res.receiptId
             deleteMessageApi({idInstance, apiTokenInstance, receiptId})
         })
@@ -89,7 +115,7 @@ const Chat = () => {
     }
 
     const openChat = chats.filter(chat => chat.chatId === activeChat)[0]
-    console.log('openChat',openChat)
+    console.log('openChat', openChat)
     return (
         <div className={styles.container}>
             <div className={styles.leftColumn}>

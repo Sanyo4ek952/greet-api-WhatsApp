@@ -1,22 +1,27 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ReceiveMessageResponse } from '../../../service/baseApi';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {ReceiveMessageResponse} from '../../../service/baseApi';
 
-type Message ={
+export type Message = {
     id: number;
     text: string;
     sender: 'me' | 'them';
 }
 
-type Chat ={
+export type ChatType = {
     chatId: string;
-    messages:Message[]
+    messages: Message[]
+}
+
+export type ReceiveMessageResponse1 = {
+    chatId: string;
+    messages: Message
 }
 
 type InitialState = {
     myMessages: Message[];
     theirMessages: ReceiveMessageResponse[];
     phoneNumber: string;
-    chats: Chat[];
+    chats: ChatType[];
     activeChat: string | null;
 };
 
@@ -37,7 +42,7 @@ export const chatSlice = createSlice({
         },
         addChat: (state, action: PayloadAction<string>) => {
             const phoneNumber = action.payload;
-                state.chats.unshift({ chatId:phoneNumber, messages: [] });
+            state.chats.unshift({chatId: phoneNumber, messages: []});
 
         },
         setActiveChat: (state, action: PayloadAction<string>) => {
@@ -47,39 +52,56 @@ export const chatSlice = createSlice({
             state.theirMessages = [];
         },
         sendMessage: (state, action: PayloadAction<{ text: string, phoneNumber: string }>) => {
-            const { text, phoneNumber } = action.payload;
-            const message: Message = { text, id: Date.now(), sender: 'me' };
+            const {text, phoneNumber} = action.payload;
+            const message: Message = {text, id: Date.now(), sender: 'me'};
 
-            const chatExists = state.chats.find((chat: Chat) => chat.chatId === phoneNumber);
+            const chatExists = state.chats.find((chat: ChatType) => chat.chatId === phoneNumber);
 
             if (chatExists) {
 
-                state.chats = state.chats.map((chat: Chat) => {
+                state.chats = state.chats.map((chat: ChatType) => {
                     if (chat.chatId === phoneNumber) {
-                        return { ...chat, messages: [...chat.messages, message] };
+                        return {...chat, messages: [...chat.messages, message]};
                     } else {
                         return chat;
                     }
                 });
             } else {
 
-                const newChat: Chat = {
+                const newChat: ChatType = {
                     chatId: phoneNumber,
                     messages: [message],
                 };
                 state.chats.push(newChat);
             }
         },
-        receiveMessage: (state, action: PayloadAction<ReceiveMessageResponse>) => {
-            console.log(action.payload)
-       state.theirMessages.push(action.payload);
+        receiveMessage: (state, action: PayloadAction<ReceiveMessageResponse1>) => {
+            const chatExists = state.chats.find((chat: ChatType) => chat.chatId === action.payload.chatId);
+            if (chatExists) {
+
+                state.chats = state.chats.map((chat: ChatType) => {
+                    if (chat.chatId === action.payload.chatId) {
+                        return {...chat, messages: [...chat.messages, action.payload.messages]};
+                    } else {
+                        return chat;
+                    }
+                });
+            } else {
+
+                const newChat: ChatType = {
+                    chatId: action.payload.chatId,
+                    messages: [action.payload.messages],
+                }
+                state.chats.push(newChat);
+            }
+
         },
 
         deleteMessage: (state, action: PayloadAction<number>) => {
-            state.myMessages = state.myMessages.filter(msg => msg.id !== action.payload);
+            // state.myMessages = state.myMessages.filter(msg => msg.id !== action.payload);
         }
     }
 });
 
-export const { setPhoneNumber, addChat, setActiveChat,receiveMessage, sendMessage, deleteMessage } = chatSlice.actions;
+export const {setPhoneNumber, addChat, setActiveChat, receiveMessage, sendMessage} = chatSlice.actions;
 export default chatSlice.reducer;
