@@ -24,8 +24,6 @@ const Chat = () => {
         phoneNumber,
         chats,
         activeChat,
-        myMessages,
-        theirMessages,
     } = useAppSelector(state => state.chat);
 
     const [message, setMessage] = useState('');
@@ -98,7 +96,7 @@ const Chat = () => {
 
         // Очистка интервала при размонтировании компонента
         return () => clearInterval(interval);
-    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch]); // Зависимости
+    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch, getMessages]); // Зависимости
     // Обновление сообщений
     const updateMessage = async () => {
         refetch().unwrap().then(res => {
@@ -170,7 +168,7 @@ const Chat = () => {
                             onChange={(e) => setMessage(e.target.value)}
                             placeholder="Введите сообщение"
                             className={styles.input}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                         />
                     </div>
                     <div className={styles.inputArea}>

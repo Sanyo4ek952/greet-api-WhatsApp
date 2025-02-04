@@ -97,11 +97,7 @@ export const chatSlice = createSlice({
 
         },
 
-        deleteMessage: (state, action: PayloadAction<number>) => {
-            // state.myMessages = state.myMessages.filter(msg => msg.id !== action.payload);
-        }
     }
 });
 
 export const {setPhoneNumber, addChat, setActiveChat, receiveMessage, sendMessage} = chatSlice.actions;
-export default chatSlice.reducer;
