@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import styles from './ChatList.module.scss';
 import {Message, receiveMessage, setActiveChat} from "../../model/chatSlice";
 import {useDeleteMessageMutation, useReceiveMessageQuery} from "../../../../service/baseApi";
@@ -7,6 +7,8 @@ import {useAppDispatch, useAppSelector} from "../../../../common/utils/storeHook
 
 export const ChatList = () => {
     const dispatch = useAppDispatch();
+    const [isFetching, setIsFetching] = useState(false);
+
     const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
     const {
         chats,
@@ -19,6 +21,11 @@ export const ChatList = () => {
     };
     useEffect(() => {
         const interval = setInterval(async () => {
+            if (isFetching) {
+                return;
+            }
+
+            setIsFetching(true);
             try {
                 const res = await refetch().unwrap();
 
@@ -38,11 +45,11 @@ export const ChatList = () => {
                     const receiptId = res.receiptId;
                     await deleteMessageApi({idInstance, apiTokenInstance, receiptId});
                 }
-
             } catch (error) {
                 console.error('Ошибка при обновлении сообщений:', error);
+            } finally {
+                setIsFetching(false);
             }
-            return () => clearInterval(interval);
         }, 3000);
 
         return () => clearInterval(interval);
