@@ -9,11 +9,12 @@ import {useNavigate} from "react-router-dom";
 const Chat = () => {
     const {idInstance, apiTokenInstance} = useAppSelector(state => state.authorized);
     const navigate = useNavigate();
+
     useEffect(() => {
-        if (idInstance === '') {
+        if (idInstance === '' || apiTokenInstance === '') {
             navigate('/')
         }
-    }, [idInstance]);
+    }, [idInstance, apiTokenInstance, navigate]);
     return (
         <div className={styles.container}>
             <div className={styles.leftColumn}>

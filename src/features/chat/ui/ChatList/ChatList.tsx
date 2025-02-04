@@ -4,11 +4,6 @@ import {Message, receiveMessage, setActiveChat} from "../../model/chatSlice";
 import {useDeleteMessageMutation, useReceiveMessageQuery} from "../../../../service/baseApi";
 import {useAppDispatch, useAppSelector} from "../../../../common/utils/storeHook";
 
-interface Chat {
-    chatId: string;
-    messages: { id: number; text: string; sender: string }[];
-}
-
 
 export const ChatList = () => {
     const dispatch = useAppDispatch();

@@ -17,7 +17,7 @@ export const ChatWindow = () => {
         <div className={styles.chatWindow}>
             <div className={styles.messages}>
 
-                {openChat?.messages?.length == 0 ? "Сообщений нет": openChat?.messages?.map((message) => (
+                {openChat?.messages?.length === 0 ? "Сообщений нет": openChat?.messages?.map((message) => (
                     <Message key={message.id} text={message.text} sender={message.sender}/>
                 ))}
             </div>
