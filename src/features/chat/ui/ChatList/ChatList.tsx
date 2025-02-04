@@ -5,22 +5,20 @@ import {useDeleteMessageMutation, useReceiveMessageQuery} from "../../../../serv
 import {useAppDispatch, useAppSelector} from "../../../../common/utils/storeHook";
 import {storage} from "../../../../common/utils/storage";
 
-
 export const ChatList = () => {
     const dispatch = useAppDispatch();
     const [isFetching, setIsFetching] = useState(false);
 
-    const idInstance = storage.getIdInstance()
-    const apiTokenInstance = storage.getApiTokenInstance()
-    const {
-        chats,
-        activeChat,
-    } = useAppSelector(state => state.chat);
-    const {refetch} = useReceiveMessageQuery({ idInstance: idInstance || '', apiTokenInstance: apiTokenInstance || '' });
+    const idInstance = storage.getIdInstance();
+    const apiTokenInstance = storage.getApiTokenInstance();
+    const {chats, activeChat} = useAppSelector(state => state.chat);
+    const {refetch} = useReceiveMessageQuery({idInstance: idInstance || '', apiTokenInstance: apiTokenInstance || ''});
     const [deleteMessageApi] = useDeleteMessageMutation();
+
     const onSelectChat = (phoneNumber: string) => {
         dispatch(setActiveChat(phoneNumber));
     };
+
     const fetchMessages = useCallback(async () => {
         if (isFetching) {
             return;
@@ -29,6 +27,7 @@ export const ChatList = () => {
         setIsFetching(true);
         try {
             const res = await refetch().unwrap();
+            console.log('Response from server:', res); // Лог для проверки ответа от сервера
 
             if (res && res.body && res.body.messageData?.textMessageData?.textMessage) {
                 const message: Message = {
@@ -41,22 +40,22 @@ export const ChatList = () => {
                     messages: message
                 };
                 dispatch(receiveMessage(chat));
+                console.log('Received message:', message);
 
             }
             const receiptId = res.receiptId;
-            await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
+            await deleteMessageApi({idInstance, apiTokenInstance, receiptId});
         } catch (error) {
-            console.error('Ошибка при обновлении сообщений:', error);
+
         } finally {
-            setIsFetching(false);
-            fetchMessages();
+                setIsFetching(false)
+           await fetchMessages();
         }
-    },[refetch, isFetching, dispatch ])
+    },[apiTokenInstance, deleteMessageApi, dispatch, idInstance, isFetching, refetch])
 
     useEffect(() => {
-        fetchMessages();
-        return () => {
-        };
+        const interval = setInterval(fetchMessages, 3000);
+        return () => clearInterval(interval);
     }, [fetchMessages]);
 
     return (
