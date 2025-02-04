@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/greet-api-WhatsApp/static/css/main.e11fc307.css",
-    "main.js": "/greet-api-WhatsApp/static/js/main.3c5903d5.js",
+    "main.js": "/greet-api-WhatsApp/static/js/main.1828830a.js",
     "static/js/453.1026f103.chunk.js": "/greet-api-WhatsApp/static/js/453.1026f103.chunk.js",
     "static/media/search.svg": "/greet-api-WhatsApp/static/media/search.2d37f4c9540de85d3d0f.svg",
     "index.html": "/greet-api-WhatsApp/index.html",
     "main.e11fc307.css.map": "/greet-api-WhatsApp/static/css/main.e11fc307.css.map",
-    "main.3c5903d5.js.map": "/greet-api-WhatsApp/static/js/main.3c5903d5.js.map",
+    "main.1828830a.js.map": "/greet-api-WhatsApp/static/js/main.1828830a.js.map",
     "453.1026f103.chunk.js.map": "/greet-api-WhatsApp/static/js/453.1026f103.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e11fc307.css",
-    "static/js/main.3c5903d5.js"
+    "static/js/main.1828830a.js"
   ]
 }
