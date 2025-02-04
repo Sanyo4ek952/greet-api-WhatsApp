@@ -21,6 +21,8 @@ const router = createBrowserRouter([
         ]
     },
 
-]);
+],{
+    basename: '/greet-api-WhatsApp'
+});
 
 export default router;
