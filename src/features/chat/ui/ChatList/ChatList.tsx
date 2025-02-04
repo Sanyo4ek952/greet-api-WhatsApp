@@ -41,16 +41,17 @@ export const ChatList = () => {
                     messages: message
                 };
                 dispatch(receiveMessage(chat));
-                const receiptId = res.receiptId;
-                await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
+
             }
+            const receiptId = res.receiptId;
+            await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
         } catch (error) {
             console.error('Ошибка при обновлении сообщений:', error);
         } finally {
             setIsFetching(false);
             fetchMessages();
         }
-    },[isFetching, refetch, dispatch, deleteMessageApi, idInstance, apiTokenInstance])
+    },[refetch, isFetching, dispatch ])
 
     useEffect(() => {
         fetchMessages();
