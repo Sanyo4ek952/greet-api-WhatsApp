@@ -20,7 +20,6 @@ export const PhoneInput = () => {
         if (phoneNumber) {
             dispatch(addChat(phoneNumber));
             dispatch(setActiveChat(phoneNumber));
-            dispatch(setPhoneNumber(''));
         }
     };
     return (
