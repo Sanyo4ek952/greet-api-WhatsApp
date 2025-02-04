@@ -1,0 +1,28 @@
+.chatList {
+  overflow-y: auto;
+}
+
+.chatItem {
+  padding: 8px;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin-bottom: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(59, 74, 84, 0.3);
+  }
+}
+
+.chatItem.active {
+  background-color: rgba(59, 74, 84, 0.6);
+}
+
+.phoneNumber {
+  font-weight: bold;
+}
+
+.lastMessage {
+  font-size: 0.85rem;
+  color: #888;
+}
