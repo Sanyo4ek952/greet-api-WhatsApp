@@ -13,7 +13,7 @@ const Chat = () => {
 
     useLayoutEffect(() => {
         if (idInstance === '' || apiTokenInstance === '') {
-            navigate(-1)
+            navigate('/')
             return
         }
     }, [idInstance, apiTokenInstance, navigate]);
