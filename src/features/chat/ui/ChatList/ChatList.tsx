@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import styles from './ChatList.module.scss';
 import {Message, receiveMessage, setActiveChat} from "../../model/chatSlice";
 import {useDeleteMessageMutation, useReceiveMessageQuery} from "../../../../service/baseApi";
@@ -21,41 +21,43 @@ export const ChatList = () => {
     const onSelectChat = (phoneNumber: string) => {
         dispatch(setActiveChat(phoneNumber));
     };
+    const fetchMessages = useCallback(async () => {
+        if (isFetching) {
+            return;
+        }
+
+        setIsFetching(true);
+        try {
+            const res = await refetch().unwrap();
+
+            if (res && res.body && res.body.messageData?.textMessageData?.textMessage) {
+                const message: Message = {
+                    id: Date.now(),
+                    text: res.body.messageData.textMessageData.textMessage,
+                    sender: 'them'
+                };
+                const chat = {
+                    chatId: res.body.senderData.chatId.substring(0, 11),
+                    messages: message
+                };
+                dispatch(receiveMessage(chat));
+                const receiptId = res.receiptId;
+                await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
+            }
+        } catch (error) {
+            console.error('Ошибка при обновлении сообщений:', error);
+        } finally {
+            setIsFetching(false);
+            fetchMessages();
+        }
+    },[isFetching, refetch, dispatch, deleteMessageApi, idInstance, apiTokenInstance])
+
     useEffect(() => {
-        const interval = setInterval(async () => {
-            if (isFetching) {
-                return;
-            }
+        fetchMessages();
+        return () => {
+        };
+    }, [fetchMessages]);
 
-            setIsFetching(true);
-            try {
-                const res = await refetch().unwrap();
-
-                if (res && res.body && res.body.messageData?.textMessageData?.textMessage) {
-                    const message: Message = {
-                        id: Date.now(),
-                        text: res.body.messageData.textMessageData.textMessage,
-                        sender: 'them'
-                    }
-                    const chat = {
-                        chatId: res.body.senderData.chatId.substring(0, 11),
-                        messages: message
-                    }
-                    dispatch(receiveMessage(chat));
-                }
-                if (res) {
-                    const receiptId = res.receiptId;
-                    await deleteMessageApi({idInstance, apiTokenInstance, receiptId});
-                }
-            } catch (error) {
-                console.error('Ошибка при обновлении сообщений:', error);
-            } finally {
-                setIsFetching(false);
-            }
-        }, 3000);
-
-        return () => clearInterval(interval);
-    }, [idInstance, apiTokenInstance, dispatch, deleteMessageApi, refetch, isFetching]);
     return (
         <div className={styles.chatList}>
             <h3>Чаты</h3>
