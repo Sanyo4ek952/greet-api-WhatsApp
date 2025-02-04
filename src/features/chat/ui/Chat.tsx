@@ -1,4 +1,4 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useEffect} from 'react';
 import styles from './Chat.module.scss';
 import {ChatList} from "./ChatList/ChatList";
 import {ChatWindow} from "./ChatWindow/ChatWindow";
@@ -11,7 +11,7 @@ const Chat = () => {
     const apiTokenInstance = storage.getApiTokenInstance()
     let navigate = useNavigate();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (idInstance === '' || apiTokenInstance === '') {
             navigate('/')
             return
