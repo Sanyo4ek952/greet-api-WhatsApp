@@ -1,15 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReceiveMessageResponse } from '../../../service/baseApi';
 
-interface Message {
+type Message ={
     id: number;
     text: string;
     sender: 'me' | 'them';
 }
 
-interface Chat {
-    phoneNumber: string;
-    lastMessage: string;
+type Chat ={
+    chatId: string;
+    messages:Message[]
 }
 
 type InitialState = {
@@ -37,9 +37,8 @@ export const chatSlice = createSlice({
         },
         addChat: (state, action: PayloadAction<string>) => {
             const phoneNumber = action.payload;
-            if (!state.chats.some(chat => chat.phoneNumber === phoneNumber)) {
-                state.chats.push({ phoneNumber, lastMessage: '' });
-            }
+                state.chats.unshift({ chatId:phoneNumber, messages: [] });
+
         },
         setActiveChat: (state, action: PayloadAction<string>) => {
             state.activeChat = action.payload;
@@ -47,13 +46,28 @@ export const chatSlice = createSlice({
             state.myMessages = [];
             state.theirMessages = [];
         },
-        sendMessage: (state, action: PayloadAction<{ text: string }>) => {
-            if (state.activeChat) {
-                state.myMessages.push({ id: Date.now(), text: action.payload.text, sender: 'me' });
-                const chat = state.chats.find(chat => chat.phoneNumber === state.activeChat);
-                if (chat) {
-                    chat.lastMessage = action.payload.text;
-                }
+        sendMessage: (state, action: PayloadAction<{ text: string, phoneNumber: string }>) => {
+            const { text, phoneNumber } = action.payload;
+            const message: Message = { text, id: Date.now(), sender: 'me' };
+
+            const chatExists = state.chats.find((chat: Chat) => chat.chatId === phoneNumber);
+
+            if (chatExists) {
+
+                state.chats = state.chats.map((chat: Chat) => {
+                    if (chat.chatId === phoneNumber) {
+                        return { ...chat, messages: [...chat.messages, message] };
+                    } else {
+                        return chat;
+                    }
+                });
+            } else {
+
+                const newChat: Chat = {
+                    chatId: phoneNumber,
+                    messages: [message],
+                };
+                state.chats.push(newChat);
             }
         },
         receiveMessage: (state, action: PayloadAction<ReceiveMessageResponse>) => {

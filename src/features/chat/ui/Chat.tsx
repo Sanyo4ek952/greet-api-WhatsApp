@@ -41,7 +41,8 @@ const Chat = () => {
         if (message.trim() && activeChat) {
             try {
                 await sendMessageApi({phoneNumber: activeChat, message, idInstance, apiTokenInstance}).unwrap();
-                dispatch(sendMessage({text: message}));
+
+                dispatch(sendMessage({text: message, phoneNumber}));
                 setMessage('');
             } catch (error) {
                 console.error('Ошибка при отправке сообщения:', error);
@@ -62,7 +63,7 @@ const Chat = () => {
                     dispatch(receiveMessage(res)); // Добавляем новое сообщение
                     const receiptId = res.receiptId;
                     // Удаляем сообщение после обработки
-                    await deleteMessageApi({ idInstance, apiTokenInstance, receiptId });
+                    await deleteMessageApi({idInstance, apiTokenInstance, receiptId});
                 }
             } catch (error) {
                 console.error('Ошибка при обновлении сообщений:', error);
@@ -86,7 +87,9 @@ const Chat = () => {
     const setSettingHandler = () => {
         setSetting({idInstance, apiTokenInstance})
     }
-    console.log([...myMessages, ...theirMessages])
+
+    const openChat = chats.filter(chat => chat.chatId === activeChat)[0]
+    console.log('openChat',openChat)
     return (
         <div className={styles.container}>
             <div className={styles.leftColumn}>
@@ -110,11 +113,11 @@ const Chat = () => {
                     {chats.map((chat, index) => (
                         <div
                             key={index}
-                            className={`${styles.chatItem} ${activeChat === chat.phoneNumber ? styles.active : ''}`}
-                            onClick={() => handleSelectChat(chat.phoneNumber)}
+                            className={`${styles.chatItem} ${activeChat === chat.chatId ? styles.active : ''}`}
+                            onClick={() => handleSelectChat(chat.chatId)}
                         >
-                            <div className={styles.phoneNumber}>{chat.phoneNumber}</div>
-                            <div className={styles.lastMessage}>{chat.lastMessage}</div>
+                            <div className={styles.phoneNumber}>{chat.chatId}</div>
+                            <div className={styles.lastMessage}>{chat.chatId}</div>
                         </div>
                     ))}
                 </div>
@@ -123,25 +126,15 @@ const Chat = () => {
             <div className={styles.rightColumn}>
                 <div className={styles.chatWindow}>
                     <div className={styles.messages}>
-                        {[...myMessages, ...theirMessages].map((msg, index) => {
-                            // Проверяем, является ли сообщение объектом типа ReceiveMessageResponse или Message
-                            if ('text' in msg) { // Проверка на наличие поля text, чтобы убедиться, что это Message
-                                return (
-                                    <div key={index}
-                                         className={msg.sender === 'me' ? styles.myMessage : styles.theirMessage}>
-                                        {msg.text}
-                                    </div>
-                                );
-                            } else if (msg.body?.messageData?.textMessageData?.textMessage) { // Проверка для ReceiveMessageResponse
-                                const messageText = msg.body.messageData.textMessageData.textMessage;
-                                return (
-                                    <div key={index} className={styles.theirMessage}>
-                                        {messageText}
-                                    </div>
-                                );
-                            }
-                            return null; // Возвращаем null, если не нашли подходящий тип
+
+                        {openChat?.messages.map((message) => {
+                            return (
+                                <div key={message.id}
+                                     className={message.sender === 'me' ? styles.myMessage : styles.theirMessage}>{message.text}</div>
+                            )
                         })}
+
+
                     </div>
 
                     <div className={styles.inputArea}>
