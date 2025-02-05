@@ -48,10 +48,10 @@ export const ChatList = () => {
         } catch (error) {
 
         } finally {
-                setIsFetching(false)
-           await fetchMessages();
+            setIsFetching(false)
+            await fetchMessages();
         }
-    },[apiTokenInstance, deleteMessageApi, dispatch, idInstance, isFetching, refetch])
+    }, [apiTokenInstance, deleteMessageApi, dispatch, idInstance, isFetching, refetch])
 
     useEffect(() => {
         const interval = setInterval(fetchMessages, 3000);
@@ -61,9 +61,9 @@ export const ChatList = () => {
     return (
         <div className={styles.chatList}>
             <h3>Чаты</h3>
-            {chats.map((chat, index) => (
+            {chats.map(chat => (
                 <div
-                    key={index}
+                    key={chat.chatId}
                     className={`${styles.chatItem} ${activeChat === chat.chatId ? styles.active : ''}`}
                     onClick={() => onSelectChat(chat.chatId)}
                 >
